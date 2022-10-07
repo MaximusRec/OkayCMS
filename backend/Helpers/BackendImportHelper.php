@@ -501,10 +501,13 @@ class BackendImportHelper
                 // Найдем категорию по имени
                 $select = $this->queryFactory->newSelect();
                 $id = $select->cols(['id'])
-                    ->from(CategoriesEntity::getTable())
-                    ->where('name=:name')
-                    ->where('parent_id=:parent')
+                    ->from(CategoriesEntity::getTable() . ' AS ' . CategoriesEntity::getTableAlias())
+                    ->leftJoin(CategoriesEntity::getLangTable() . ' AS ' . CategoriesEntity::getTableAlias() . 'l',
+                        CategoriesEntity::getTableAlias() . '.id = ' . CategoriesEntity::getTableAlias() . 'l' . '.category_id AND lang_id = :lang_id')
+                    ->where(CategoriesEntity::getTableAlias() . 'l' . '.name=:name')
+                    ->where(CategoriesEntity::getTableAlias() . '.parent_id=:parent')
                     ->bindValue('name', $name)
+                    ->bindValue('lang_id', $this->languages->getLangId())
                     ->bindValue('parent', $parent)->result('id');
 
                 // Если не найдена - добавим ее
