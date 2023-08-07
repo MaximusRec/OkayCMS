@@ -24,14 +24,24 @@ class DeliveryFieldsExtender implements ExtensionInterface
      */
     public function extendGetCartDeliveriesList($deliveries)
     {
-        $deliveryFields = $this->deliveryFieldsHelper->findDeliveryFields([
-            'delivery_id' => array_keys($deliveries),
-            'visible' => true,
-        ]);
+        if (!empty($deliveries)) {
+            $deliveryFields = $this->deliveryFieldsHelper->findDeliveryFields([
+                'delivery_id' => array_keys($deliveries),
+                'visible' => true,
+            ]);
 
-        foreach ($deliveryFields as $deliveryField) {
-            foreach ($deliveryField->deliveries as $deliveryId) {
-                $deliveries[$deliveryId]->delivery_fields[] = $deliveryField;
+            foreach ($deliveryFields as $deliveryField) {
+                if (!empty($deliveryField->deliveries)
+                ) {
+                    foreach ($deliveryField->deliveries as $deliveryId) {
+                        if (!empty($deliveryId)) {
+                            if (empty($deliveries[$deliveryId])) {
+                                $deliveries[$deliveryId] = new \stdClass();
+                            }
+                            $deliveries[$deliveryId]->delivery_fields[] = $deliveryField;
+                        }
+                    }
+                }
             }
         }
 
